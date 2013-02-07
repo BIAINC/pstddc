@@ -10,7 +10,7 @@ if (Test-Path $tddc_module_dir)
 }
 
 Write-Host "Installing TotalDiscovery.com Admin Pack"
-
+Write-Host " - Version: <%= ENV['VERSION'] %>"
 mkdir $tddc_module_dir | Out-Null
 
 Invoke-WebRequest https://s3.amazonaws.com/pstddc/<%= base_key %>/TotalDiscovery.ps1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psm1')
