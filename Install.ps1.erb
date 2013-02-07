@@ -13,7 +13,7 @@ Write-Host "Installing TotalDiscovery.com Admin Pack"
 
 mkdir $tddc_module_dir | Out-Null
 
-Invoke-WebRequest https://s3.amazonaws.com/<%= base_key %>/TotalDiscovery.ps1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psm1')
-Invoke-WebRequest https://s3.amazonaws.com/<%= base_key %>/TotalDiscovery.psd1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psd1')
+Invoke-WebRequest https://s3.amazonaws.com/pstddc/<%= base_key %>/TotalDiscovery.ps1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psm1')
+Invoke-WebRequest https://s3.amazonaws.com/pstddc/<%= base_key %>/TotalDiscovery.psd1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psd1')
 
 Import-Module TotalDiscovery
