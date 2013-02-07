@@ -4,10 +4,8 @@ Bundler.require
 
 require 'erb'
 
-$stderr.sync=true
-$stdout.sync=true
-STDOUT.reopen
-STDERR.reopen
+STDOUT.sync=true
+STDERR.sync=true
 
 task :default => :test
 
@@ -58,7 +56,6 @@ task :release => [:environment, :test] do
   bucket.objects["#{base_key}/TotalDiscovery.ps1"].write(Pathname.new('TotalDiscovery.ps1'), :content_type => 'text/plain')
   bucket.objects["#{base_key}/TotalDiscovery.psd1"].write(Pathname.new('TotalDiscovery.psd1'), :content_type => 'text/plain')
 
-  puts ENV.inspect
   if ENV['RELEASE_ENV'] =~ /release/
     puts "Releasing Installer"
     bucket.objects["Install.ps1"].write(install_content, :content_type => 'application/text')
