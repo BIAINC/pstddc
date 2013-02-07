@@ -48,11 +48,12 @@ task :release => [:environment, :test] do
   install_content = install_template.result(binding)
 
   puts "Uploading Build"
+
   bucket.objects["#{base_key}/Install.ps1"].write(install_content, :content_type => 'text/plain')
   bucket.objects["#{base_key}/TotalDiscovery.ps1"].write(Pathname.new('TotalDiscovery.ps1'), :content_type => 'text/plain')
   bucket.objects["#{base_key}/TotalDiscovery.psd1"].write(Pathname.new('TotalDiscovery.psd1'), :content_type => 'text/plain')
 
-  if ENV['RELEASE_ENV'].eql?('release')
+  if ENV['RELEASE_ENV'] =~ /release/
     puts "Releasing Installer"
     bucket.objects["/Install.ps1"].write(install_content, :content_type => 'application/text')
   end
