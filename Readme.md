@@ -31,6 +31,13 @@ __IMPORTANT__
   Connect-TDDC -AuthToken <Your Auth Token>
 ````
 
+3. If you are testing against a sandbox, you can specify both a server and authentication token.
+```powershell
+  Connect-TDDC -AuthToken <Your Auth Token> -Server <Your API Server>
+  // Some Servers do not support SSL (Testing). To Turn off SSL uncomment the following:
+  // Set-Variable -Name TDDCProtocol -Value http -Scope Global
+```
+
 
 ### Upload data From a CSV to your company
   1. Download [users.csv](https://github.com/BIAINC/pstddc/raw/master/samples/users.csv) from the [samples folder](https://github.com/BIAINC/pstddc/raw/master/samples/)
