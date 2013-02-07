@@ -330,10 +330,3 @@ function Set-Custodian
 
 }
 
-#Connect-TDDC -Server app.zorin.local -AuthToken GTQesCCzyP4XxrmeRLNY
-#$Global:TDDCProtocol = 'http'
-#Set-Custodian -Matter 8 -name pmorton -emailaddress pmorton
-
-#Get-ADUser -LDAPFilter "(&(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*biaprotect.com))" -Properties OfficePhone,EmailAddress,Title,Office,Department,Description,Manager | Where {$_.Name -match "Paul"} | Set-Custodian -Matter 8
-
-
