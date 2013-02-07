@@ -1,9 +1,10 @@
-
 ## Pre-Requisites
-  ### Required
-    - Powershell v3 (http://www.microsoft.com/en-us/download/details.aspx?id=34595)
-  #### Optional
-    - Active Directory CmdLets - Used for syncing Active Directory
+
+### Required
+  - Powershell v3 (http://www.microsoft.com/en-us/download/details.aspx?id=34595)
+
+#### Optional
+  - Active Directory CmdLets - Used for syncing Active Directory
 
 ## Installation
 
@@ -20,9 +21,9 @@
 
 ## Examples
 
-** IMPORTANT ***
+__IMPORTANT__
 
-1. In the examples below, you should replace anything enclosed in <> with approprate value. For example <code><matter id><code> would be replaced with <code>1<code> if my matter id was one.
+1. In the examples below, you should replace anything enclosed in <> with approprate value. For example <code>&lt;matter id&gt;</code> would be replaced with <code>1</code> if my matter id was one.
 
 2. Once per session, you need to set your authorization token. If you do not set the authorization token, _none_ of the examples below will work.
 
