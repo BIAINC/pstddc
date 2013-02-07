@@ -1,0 +1,19 @@
+$modules_dir = [System.String]::Join('\',@($ENV:windir , 'system32' , 'WindowsPowerShell' , 'v1.0' , 'Modules'))
+$tddc_module_dir = Join-Path $modules_dir 'TotalDiscovery'
+
+if (Test-Path $tddc_module_dir)
+{
+
+  Write-Host "Upgrade Detected"
+  Remove-Module TotalDiscovery -ErrorAction SilentlyContinue
+  rm -recurse -force $tddc_module_dir
+}
+
+Write-Host "Installing TotalDiscovery.com Admin Pack"
+
+mkdir $tddc_module_dir | Out-Null
+
+Invoke-WebRequest https://s3.amazonaws.com/<%= base_key %>/TotalDiscovery.ps1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psm1')
+Invoke-WebRequest https://s3.amazonaws.com/<%= base_key %>/TotalDiscovery.psd1 -OutFile (Join-Path $tddc_module_dir 'TotalDiscovery.psd1')
+
+Import-Module TotalDiscovery

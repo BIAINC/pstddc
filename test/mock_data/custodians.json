@@ -1,0 +1,36 @@
+{
+  "custodians": [
+      {
+          "id": 2,
+          "name": "Delphia Rolfson",
+          "email": "javier@walkererdman.info",
+          "phone": "012.020.4209 x241",
+          "title": "Persistent content-based adapter",
+          "location": "New Triston",
+          "department": "Exclusive logistical policy",
+          "notes": "Autem consequatur unde occaecati exercitationem autem id adipisci dolor corporis voluptate sint alias magni possimus recusandae voluptates ipsum modi quo.",
+          "first_name": null,
+          "last_name": null,
+          "supervisor_name": "Maribel Douglas",
+          "supervisor_email": "vicky_mclaughlin@schmeler.us",
+          "custodian_number": "null",
+          "company_id": 1
+      },
+      {
+          "id": 3,
+          "name": "Libbie Streich",
+          "email": "cayla@reichelwyman.name",
+          "phone": "928-707-0516",
+          "title": "Balanced even-keeled alliance",
+          "location": "Schustertown",
+          "department": "Ergonomic 3rd generation neural-net",
+          "notes": "Incidunt ex nulla dignissimos adipisci sit exercitationem a ab quis consectetur delectus repellat ipsa voluptatum in perferendis facilis odio vel est ea.",
+          "first_name": null,
+          "last_name": null,
+          "supervisor_name": "Gia O'Hara",
+          "supervisor_email": "raul.block@konopelski.com",
+          "custodian_number": null,
+          "company_id": 1
+      }
+  ]
+}
