@@ -58,7 +58,7 @@ task :release => [:environment, :test] do
 
   if ENV['RELEASE_ENV'] =~ /release/
     puts "Releasing Installer"
-    bucket.objects["Install.ps1"].write(install_content, :content_type => 'application/text')
+    bucket.objects["Install.ps1"].write(install_content, :content_type => 'text/plain')
   end
 
 end
