@@ -17,7 +17,7 @@ task :environment do
       :access_key_id => ENV['ACCESS_KEY_ID'],
       :secret_access_key => ENV['SECRET_ACCESS_KEY'])
 
-    ENV['VERSION'] = ENV['BUILD_VCS_NUMBER'] || `git rev-parse HEAD`.chomp
+    ENV['VERSION'] = ENV['BUILD_NUMBER'] || `git rev-parse HEAD`.chomp
 end
 
 desc 'Run Unit Tests'
