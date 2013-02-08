@@ -33,6 +33,7 @@ __IMPORTANT__
 2. Once per session, you need to set your authorization token. If you do not set the authorization token, _none_ of the examples below will work.
 
 ```powershell
+  Import-Module TotalDiscovery
   Connect-TDDC -AuthToken <Your Auth Token>
 ````
 
