@@ -34,7 +34,7 @@ __IMPORTANT__
     Import-Module TotalDiscovery
     Connect-TDDC -AuthToken <Your Auth Token>
   ````
-  
+
 3. Your BIA representive will provide you with a <Company> and <AuthToken>
 
 ## Examples
@@ -58,6 +58,7 @@ __IMPORTANT__
 ### Import data from ActiveDirectory to a matter
   1. **You must be on a machine that has the ActiveDirectory CmdLets installed**
   2.  Find all ActiveDirectory users who are enabled and have a e-mail address field and adds them to a matter
+
   ```powershell
     Get-ADUser -LDAPFilter "(&(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*))" -Properties OfficePhone,EmailAddress,Title,Office,Department,Description,Manager | Set-Custodian -Matter <matter>
   ```
