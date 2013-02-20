@@ -15,44 +15,45 @@
 
   - Latest Release Version
 
-```powershell
-  Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/Install.ps1).Content
-```
-  - CI Build - Replace <version> with the version you want to deploy
-    
-```powershell
-  Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/ci/<version>/Install.ps1).Content
-```
-
-## Examples
+  ```powershell
+    Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/Install.ps1).Content
+  ```
+    - CI Build - Replace <version> with the version you want to deploy
+      
+  ```powershell
+    Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/ci/<version>/Install.ps1).Content
+  ```
 
 __IMPORTANT__
 
 1. In the examples below, you should replace anything enclosed in <> with approprate value. For example <code>&lt;matter id&gt;</code> would be replaced with <code>1</code> if my matter id was one.
 
-2. Once per session, you need to set your authorization token. If you do not set the authorization token, _none_ of the examples below will work.
+2. Once per session, you need to set your authorization token. If you do not set the authorization token, _none_ of the examples below will work
 
-```powershell
-  Import-Module TotalDiscovery
-  Connect-TDDC -AuthToken <Your Auth Token>
-````
+  ```powershell
+    Import-Module TotalDiscovery
+    Connect-TDDC -AuthToken <Your Auth Token>
+  ````
+  
+3. Your BIA representive will provide you with a <Company> and <AuthToken>
 
+## Examples
 
 ### Upload data From a CSV to your company
   1. Download [users.csv](https://github.com/BIAINC/pstddc/raw/master/samples/users.csv) from the [samples folder](https://github.com/BIAINC/pstddc/tree/master/samples)
   2. Import the CSV and sync the custodian details on the company. If the custodian already exists, it will be updated. 
 
-```powershell
-  Import-CSV <downloaded_csv> | Set-Custodian -Company <Company>
-```
+  ```powershell
+    Import-CSV <downloaded_csv> | Set-Custodian -Company <Company>
+  ```
 
 ### Upload data From a CSV to a matter
   1. Download [users.csv](https://github.com/BIAINC/pstddc/raw/master/samples/users.csv) from the [samples folder](https://github.com/BIAINC/pstddc/raw/master/samples/)
   2. Import the CSV and sync the custodian details on the matter. If the custodian already exists, it will be updated. 
 
-```powershell
-  Import-CSV <downloaded_csv> | Set-Custodian -Matter <Matter>
-```
+  ```powershell
+    Import-CSV <downloaded_csv> | Set-Custodian -Matter <Matter>
+  ```
 
 ### Import data from ActiveDirectory to a matter
   1. **You must be on a machine that has the ActiveDirectory CmdLets installed**
