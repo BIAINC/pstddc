@@ -1,3 +1,6 @@
+# Copyright © 2013 Business Intelligence Associates, Inc.
+# All Rights Reserved
+
 Set-Variable -Name 'TDDCServer' -Value 'app.totaldiscovery.com' -Scope Global
 Set-Variable -Name 'TDDCProtocol' -Value 'https' -Scope Global
 

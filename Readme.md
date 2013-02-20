@@ -39,7 +39,7 @@ __IMPORTANT__
 
 
 ### Upload data From a CSV to your company
-  1. Download [users.csv](https://github.com/BIAINC/pstddc/raw/master/samples/users.csv) from the [samples folder](https://github.com/BIAINC/pstddc/raw/master/samples/)
+  1. Download [users.csv](https://github.com/BIAINC/pstddc/raw/master/samples/users.csv) from the [samples folder](https://github.com/BIAINC/pstddc/tree/master/samples)
   2. Import the CSV and sync the custodian details on the company. If the custodian already exists, it will be updated. 
 
 ```powershell
@@ -77,3 +77,9 @@ __IMPORTANT__
   ```powershell
     GetCustodians -Matter <Matter ID>
   ```
+
+# Copyright Notice
+  ```
+Copyright © 2013 Business Intelligence Associates, Inc.
+All Rights Reserved
+```
