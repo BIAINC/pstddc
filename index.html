@@ -1,0 +1,155 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>TotalDiscovery Powershell Tools</title>
+  <meta name="description" content="Making E-Discovery Posh">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">TotalDiscovery Powershell Tools</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">Making E-Discovery Posh</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/BIAINC/pstddc/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/BIAINC/pstddc/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/BIAINC/pstddc" class="code">View TotalDiscovery Powershell Tools on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h2>Pre-Requisites</h2>
+
+<h3>Required</h3>
+
+<ul>
+<li>Powershell v3 (<a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">http://www.microsoft.com/en-us/download/details.aspx?id=34595</a>)</li>
+</ul><h4>Optional</h4>
+
+<ul>
+<li>Active Directory CmdLets - Used for syncing Active Directory 
+
+<ul>
+<li>Windows 7 (<a href="http://blogs.msdn.com/b/rkramesh/archive/2012/01/17/how-to-add-active-directory-module-in-powershell-in-windows-7.aspx">http://blogs.msdn.com/b/rkramesh/archive/2012/01/17/how-to-add-active-directory-module-in-powershell-in-windows-7.aspx</a>)</li>
+<li>Windows 2008 (<a href="http://www.windowscommandsyntax.com/windows-powershell/how-to-install-the-active-directory-module-for-powershell/">http://www.windowscommandsyntax.com/windows-powershell/how-to-install-the-active-directory-module-for-powershell/</a>)</li>
+</ul>
+</li>
+</ul><h2>Installation</h2>
+
+<ol>
+<li>Open Powershell</li>
+<li>Install the required version</li>
+</ol><ul>
+<li>Latest Release Version</li>
+</ul><div class="highlight"><pre>  <span class="nb">Invoke-Expression</span> <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">https</span><span class="err">:</span><span class="p">//</span><span class="n">s3</span><span class="p">.</span><span class="n">amazonaws</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">pstddc</span><span class="p">/</span><span class="n">Install</span><span class="p">.</span><span class="n">ps1</span><span class="p">).</span><span class="n">Content</span>
+</pre></div>
+
+<ul>
+<li>CI Build - Replace  with the version you want to deploy</li>
+</ul><div class="highlight"><pre>  <span class="nb">Invoke-Expression</span> <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">https</span><span class="err">:</span><span class="p">//</span><span class="n">s3</span><span class="p">.</span><span class="n">amazonaws</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">pstddc</span><span class="p">/</span><span class="n">ci</span><span class="p">/&lt;</span><span class="n">version</span><span class="p">&gt;/</span><span class="n">Install</span><span class="p">.</span><span class="n">ps1</span><span class="p">).</span><span class="n">Content</span>
+</pre></div>
+
+<h2>Examples</h2>
+
+<p><strong>IMPORTANT</strong></p>
+
+<ol>
+<li><p>In the examples below, you should replace anything enclosed in &lt;&gt; with approprate value. For example <code>&lt;matter id&gt;</code> would be replaced with <code>1</code> if my matter id was one.</p></li>
+<li><p>Once per session, you need to set your authorization token. If you do not set the authorization token, <em>none</em> of the examples below will work.</p></li>
+</ol><div class="highlight"><pre>  <span class="nb">Import-Module</span> <span class="n">TotalDiscovery</span>
+  <span class="nb">Connect-TDDC</span> <span class="n">-AuthToken</span> <span class="p">&lt;</span><span class="n">Your</span> <span class="n">Auth</span> <span class="n">Token</span><span class="p">&gt;</span>
+</pre></div>
+
+<h3>Upload data From a CSV to your company</h3>
+
+<ol>
+<li>Download <a href="https://github.com/BIAINC/pstddc/raw/master/samples/users.csv">users.csv</a> from the <a href="https://github.com/BIAINC/pstddc/tree/master/samples">samples folder</a>
+</li>
+<li>Import the CSV and sync the custodian details on the company. If the custodian already exists, it will be updated. </li>
+</ol><div class="highlight"><pre>  <span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Company</span> <span class="p">&lt;</span><span class="n">Company</span><span class="p">&gt;</span>
+</pre></div>
+
+<h3>Upload data From a CSV to a matter</h3>
+
+<ol>
+<li>Download <a href="https://github.com/BIAINC/pstddc/raw/master/samples/users.csv">users.csv</a> from the <a href="https://github.com/BIAINC/pstddc/raw/master/samples/">samples folder</a>
+</li>
+<li>Import the CSV and sync the custodian details on the matter. If the custodian already exists, it will be updated. </li>
+</ol><div class="highlight"><pre>  <span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Matter</span> <span class="p">&lt;</span><span class="n">Matter</span><span class="p">&gt;</span>
+</pre></div>
+
+<h3>Import data from ActiveDirectory to a matter</h3>
+
+<ol>
+<li><strong>You must be on a machine that has the ActiveDirectory CmdLets installed</strong></li>
+<li> Find all ActiveDirectory users who are enabled and have a e-mail address field and adds them to a matter
+<code>powershell
+Get-ADUser -LDAPFilter "(&amp;(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*))" -Properties OfficePhone,EmailAddress,Title,Office,Department,Description,Manager | Set-Custodian -Matter &lt;matter&gt;
+</code>
+</li>
+</ol><h3>Import data from ActiveDirectory to a company</h3>
+
+<ol>
+<li>You must be on a machine that has the ActiveDirectory CmdLets installed</li>
+<li>
+<p>Find all ActiveDirectory users who are enabled and have a e-mail address field and adds them to a company</p>
+
+<div class="highlight"><pre><span class="nb">Get-ADUser</span> <span class="n">-LDAPFilter</span> <span class="s2">"(&amp;(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*))"</span> <span class="n">-Properties</span> <span class="n">OfficePhone</span><span class="p">,</span><span class="n">EmailAddress</span><span class="p">,</span><span class="n">Title</span><span class="p">,</span><span class="n">Office</span><span class="p">,</span><span class="n">Department</span><span class="p">,</span><span class="n">Description</span><span class="p">,</span><span class="n">Manager</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Company</span> <span class="p">&lt;</span><span class="n">company</span><span class="p">&gt;</span>
+</pre></div>
+
+<h3>Listing custodians in a company</h3>
+
+<div class="highlight"><pre><span class="nb">Get-Custodians</span> <span class="n">-Company</span> <span class="p">&lt;</span><span class="n">Company</span> <span class="n">ID</span><span class="p">&gt;</span>
+</pre></div>
+
+<h3>Listing custodians in a matter</h3>
+
+<div class="highlight"><pre><span class="n">GetCustodians</span> <span class="n">-Matter</span> <span class="p">&lt;</span><span class="n">Matter</span> <span class="n">ID</span><span class="p">&gt;</span>
+</pre></div>
+</li>
+</ol><h1>Copyright Notice</h1>
+
+<pre><code>Copyright © 2013 Business Intelligence Associates, Inc.
+All Rights Reserved
+</code></pre>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/BIAINC" class="avatar"><img src="https://secure.gravatar.com/avatar/e9d69136287ddf66cf457a2ef7c9d7d2?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png" width="48" height="48"/></a> <a href="https://github.com/BIAINC">BIAINC</a> maintains <a href="https://github.com/BIAINC/pstddc">TotalDiscovery Powershell Tools</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/BIAINC/pstddc/tarball/master" class="tar">tar</a><a href="https://github.com/BIAINC/pstddc/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
