@@ -58,52 +58,57 @@
 <li>Open Powershell</li>
 <li>Install the required version</li>
 </ol><ul>
-<li>Latest Release Version</li>
-</ul><div class="highlight"><pre>  <span class="nb">Invoke-Expression</span> <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">https</span><span class="err">:</span><span class="p">//</span><span class="n">s3</span><span class="p">.</span><span class="n">amazonaws</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">pstddc</span><span class="p">/</span><span class="n">Install</span><span class="p">.</span><span class="n">ps1</span><span class="p">).</span><span class="n">Content</span>
+<li>
+<p>Latest Release Version</p>
+
+<div class="highlight"><pre><span class="nb">Invoke-Expression</span> <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">https</span><span class="err">:</span><span class="p">//</span><span class="n">s3</span><span class="p">.</span><span class="n">amazonaws</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">pstddc</span><span class="p">/</span><span class="n">Install</span><span class="p">.</span><span class="n">ps1</span><span class="p">).</span><span class="n">Content</span>
 </pre></div>
-
-<ul>
-<li>CI Build - Replace  with the version you want to deploy</li>
-</ul><div class="highlight"><pre>  <span class="nb">Invoke-Expression</span> <span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="n">https</span><span class="err">:</span><span class="p">//</span><span class="n">s3</span><span class="p">.</span><span class="n">amazonaws</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">pstddc</span><span class="p">/</span><span class="n">ci</span><span class="p">/&lt;</span><span class="n">version</span><span class="p">&gt;/</span><span class="n">Install</span><span class="p">.</span><span class="n">ps1</span><span class="p">).</span><span class="n">Content</span>
-</pre></div>
-
-<h2>Examples</h2>
-
-<p><strong>IMPORTANT</strong></p>
+</li>
+</ul><p><strong>IMPORTANT</strong></p>
 
 <ol>
 <li><p>In the examples below, you should replace anything enclosed in &lt;&gt; with approprate value. For example <code>&lt;matter id&gt;</code> would be replaced with <code>1</code> if my matter id was one.</p></li>
-<li><p>Once per session, you need to set your authorization token. If you do not set the authorization token, <em>none</em> of the examples below will work.</p></li>
-</ol><div class="highlight"><pre>  <span class="nb">Import-Module</span> <span class="n">TotalDiscovery</span>
-  <span class="nb">Connect-TDDC</span> <span class="n">-AuthToken</span> <span class="p">&lt;</span><span class="n">Your</span> <span class="n">Auth</span> <span class="n">Token</span><span class="p">&gt;</span>
+<li>
+<p>Once per session, you need to set your authorization token. If you do not set the authorization token, <em>none</em> of the examples below will work</p>
+
+<div class="highlight"><pre><span class="nb">Import-Module</span> <span class="n">TotalDiscovery</span>
+<span class="nb">Connect-TDDC</span> <span class="n">-AuthToken</span> <span class="p">&lt;</span><span class="n">Your</span> <span class="n">Auth</span> <span class="n">Token</span><span class="p">&gt;</span>
 </pre></div>
+</li>
+<li><p>Your BIA representive will provide you with a  and </p></li>
+</ol><h2>Examples</h2>
 
 <h3>Upload data From a CSV to your company</h3>
 
 <ol>
 <li>Download <a href="https://github.com/BIAINC/pstddc/raw/master/samples/users.csv">users.csv</a> from the <a href="https://github.com/BIAINC/pstddc/tree/master/samples">samples folder</a>
 </li>
-<li>Import the CSV and sync the custodian details on the company. If the custodian already exists, it will be updated. </li>
-</ol><div class="highlight"><pre>  <span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Company</span> <span class="p">&lt;</span><span class="n">Company</span><span class="p">&gt;</span>
-</pre></div>
+<li>
+<p>Import the CSV and sync the custodian details on the company. If the custodian already exists, it will be updated. </p>
 
-<h3>Upload data From a CSV to a matter</h3>
+<div class="highlight"><pre><span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Company</span> <span class="p">&lt;</span><span class="n">Company</span><span class="p">&gt;</span>
+</pre></div>
+</li>
+</ol><h3>Upload data From a CSV to a matter</h3>
 
 <ol>
 <li>Download <a href="https://github.com/BIAINC/pstddc/raw/master/samples/users.csv">users.csv</a> from the <a href="https://github.com/BIAINC/pstddc/raw/master/samples/">samples folder</a>
 </li>
-<li>Import the CSV and sync the custodian details on the matter. If the custodian already exists, it will be updated. </li>
-</ol><div class="highlight"><pre>  <span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Matter</span> <span class="p">&lt;</span><span class="n">Matter</span><span class="p">&gt;</span>
-</pre></div>
+<li>
+<p>Import the CSV and sync the custodian details on the matter. If the custodian already exists, it will be updated. </p>
 
-<h3>Import data from ActiveDirectory to a matter</h3>
+<div class="highlight"><pre><span class="nb">Import-CSV</span> <span class="p">&lt;</span><span class="n">downloaded_csv</span><span class="p">&gt;</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Matter</span> <span class="p">&lt;</span><span class="n">Matter</span><span class="p">&gt;</span>
+</pre></div>
+</li>
+</ol><h3>Import data from ActiveDirectory to a matter</h3>
 
 <ol>
 <li><strong>You must be on a machine that has the ActiveDirectory CmdLets installed</strong></li>
-<li> Find all ActiveDirectory users who are enabled and have a e-mail address field and adds them to a matter
-<code>powershell
-Get-ADUser -LDAPFilter "(&amp;(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*))" -Properties OfficePhone,EmailAddress,Title,Office,Department,Description,Manager | Set-Custodian -Matter &lt;matter&gt;
-</code>
+<li>
+<p>Find all ActiveDirectory users who are enabled and have a e-mail address field and adds them to a matter</p>
+
+<div class="highlight"><pre><span class="nb">Get-ADUser</span> <span class="n">-LDAPFilter</span> <span class="s2">"(&amp;(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=2)(mail=*))"</span> <span class="n">-Properties</span> <span class="n">OfficePhone</span><span class="p">,</span><span class="n">EmailAddress</span><span class="p">,</span><span class="n">Title</span><span class="p">,</span><span class="n">Office</span><span class="p">,</span><span class="n">Department</span><span class="p">,</span><span class="n">Description</span><span class="p">,</span><span class="n">Manager</span> <span class="p">|</span> <span class="nb">Set-Custodian</span> <span class="n">-Matter</span> <span class="p">&lt;</span><span class="n">matter</span><span class="p">&gt;</span>
+</pre></div>
 </li>
 </ol><h3>Import data from ActiveDirectory to a company</h3>
 
