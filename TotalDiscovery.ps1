@@ -264,27 +264,33 @@ function Set-Custodian
       }
       catch [System.Net.WebException]
       {
-        $e = $ERROR[0] 
-        Write-Verbose "Error: $e"
-        $response= Read-ResponseFromException -e $e
-
+        Write-Verbose "Error: $_"
+        
+        $response= Read-ResponseFromException -e $_
         $json = ConvertFrom-JSON $response
 
-        $json.errors | % {
-          $item = $_.email
-            $_.issues | % {
-              $message = ''
-              $issue = $_
-              $issue | gm | where { $_.MemberType -eq 'NoteProperty' } | % {
-                $property = $_.Name
-                $value = $issue.$property
-                $issue.$subject | % {
-                  $message = "$message $property $value; "
+        if($_.exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::Unauthorized)
+        {
+          Write-Error -Message "Your credentials are invalid or you are not allowed to perform this operation, please check your credentials and try again" -Exception $_.exception
+        } elseif ($_.exception.Response.StatusCode.ToString() -eq '422'){
+          $json.errors | % {
+            $item = $_.email
+              $_.issues | % {
+                $message = ''
+                $issue = $_
+                $issue | gm | where { $_.MemberType -eq 'NoteProperty' } | % {
+                  $property = $_.Name
+                  $value = $issue.$property
+                  $issue.$subject | % {
+                    $message = "$message $property $value; "
+                  }
                 }
+                Write-Warning "$item : $message"
               }
-              Write-Warning "$item : $message"
-            }
-          
+            
+          }
+        } else {
+          Write-Error -Message "An unknown error occourred: $($_.exception.message)"
         }
         
       }
