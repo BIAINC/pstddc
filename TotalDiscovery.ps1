@@ -309,16 +309,20 @@ function Set-Custodian
     if ( ($input) -and ($input.Manager) -and $input.Manager.StartsWith("CN=")) 
     {
       Write-Verbose "Looking up manager $($input.Manger)"
-      $manager_identity = Get-ADUser -Identity $input.Manager -Properties EmailAddress
-      $custodian['supervisor_email'] = $manager_identity.EmailAddress
-      $custodian['supervisor_name'] = $manager_identity.Name
+      try {
+        $manager_identity = Get-ADUser -Identity $input.Manager -Properties EmailAddress
+        $custodian['supervisor_email'] = $manager_identity.EmailAddress
+        $custodian['supervisor_name'] = $manager_identity.Name
+      } catch {
+        Write-Warning "Could not find $($input.Manager)"
+      }
     }
 
     $keys = $custodian.keys | % { Write-Output $_}
     $keys | % { if ($custodian.$_ -eq $null ) {$custodian.Remove($_)} }
 
-
-    Write-Verbose "Creating: $($custodian['Name'])"
+    Write-Host "Processing $($custodian['Name'])"
+    
     $custodians = $custodians + $custodian
     if($custodians.count -eq $batchSize)
     {

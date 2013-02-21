@@ -35,7 +35,7 @@ __IMPORTANT__
     Connect-TDDC -AuthToken <Your Auth Token>
   ````
 
-3. Your BIA representive will provide you with a <Company> and <AuthToken>
+3. Your BIA representive will provide you with a Company ID and Auth Token
 
 ## Examples
 
