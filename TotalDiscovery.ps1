@@ -71,7 +71,7 @@ function Read-TDDCPagingRestService
     
     $uri = New-Object System.UriBuilder("http://$(Get-TDDCServer)/$endPoint")
     $uri.Query = "$($uri.query)&limit=$pageSize&offset=$offset"
-    if( $Global:TDDCProtocol -match 'http' )
+    if( $Global:TDDCProtocol -eq 'http' )
     {
       $uri.Scheme = "http"
       $uri.Port = 80
@@ -244,7 +244,7 @@ function Set-Custodian
 
         $uri = New-Object System.UriBuilder("http://$(Get-TDDCServer)/api/v1/$api_name/$id/custodians.json")
 
-        if( $Global:TDDCProtocol -match 'http' )
+        if( $Global:TDDCProtocol -eq 'http' )
         {
           $uri.Scheme = "http"
           $uri.Port = 80
