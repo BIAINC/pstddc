@@ -373,3 +373,58 @@ function Set-Custodian
 
 }
 
+function Add-Collection 
+{
+  [CmdletBinding()]
+  param(
+    [Parameter( Mandatory=$true,
+                Position=0)]
+    [String]
+    [alias("MatterID")]
+    $Matter,
+
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+    [alias("id")]
+    [String]
+    $CustodianId,
+
+    [Int]
+    $BatchSize = 100
+  )
+
+  Begin 
+  {
+    $custodians = @()
+
+    function Send-CustodianBatch()
+    {
+      $collection_options = @{
+        'custodian_ids' = $custodians
+        'matter_id' = $matter
+      }
+      $body = (ConvertTo-Json $collection_options)
+
+      $tdCall = New-TdCall -Method "Post" -Resource @( "collections", "create_automated_collections" ) -Body $body
+      Invoke-TdCall $tdCall  
+    }
+
+  }
+
+  Process
+  {
+    $custodians += $CustodianId
+    if($custodians.count -eq $batchSize)
+    {
+      Send-CustodianBatch
+      $custodians = @()
+    } 
+  }
+
+  End 
+  { 
+    if($custodians.count -ne 0)
+    {
+      Send-CustodianBatch
+    }
+  }
+}

@@ -93,6 +93,11 @@ Describe "Get-TDDCContentType" `
   
 }
 
+Describe "New-TdCall" `
+{
+  It ''
+}
+
 Describe "Read-TDDCPagingRestService" `
 {
   Context "Reading a pageable rest interface" `
