@@ -21,10 +21,29 @@ function Connect-TDDC()
 
   [Parameter( Position=1)]
   [String]
-  $Server)
+  $Server,
+
+  [Parameter( Position=2)]
+  [String]
+  $Protocol,
+
+  [Parameter( Position=3)]
+  [Int]
+  $Port)
 
     if (-not [System.String]::IsNullOrEmpty($AuthToken)) { Set-Variable -Name 'TDDCToken' -Value $AuthToken -Scope Global }
     if (-not [System.String]::IsNullOrEmpty($Server)) { Set-Variable -Name 'TDDCServer' -Value $Server -Scope Global } 
+    
+    if (-not [System.String]::IsNullOrEmpty($Protocol))
+    {
+      if ( -not ( $Protocol -imatch 'http' -or $Protocol -imatch 'https' ) )
+      {
+        Write-Error "The protocol must be http or https. $Protocol is invalid"
+      } 
+      Set-Variable -Name 'TDDCProtocol' -Value $Protocol -Scope Global 
+    }
+    
+    if (-not [System.String]::IsNullOrEmpty($Port)) { Set-Variable -Name 'TDDCPort' -Value $Port -Scope Global }
 
 }
 
@@ -46,7 +65,7 @@ function Get-TDDCHeaders()
     throw (new-object System.ArgumentException("You must specify an auth-token before you can make requests to TotalDiscovery.com"))
   }
 
-  return @{"X-AUTH-TOKEN"= (Get-TDDCToken) }
+  return @{"X-AUTH-TOKEN"= (Get-TDDCToken); "X-CLIENT-NAME" = 'PsTDDC' }
 }
 
 function Get-TDDCContentType()
@@ -164,6 +183,8 @@ function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [S
     $uri.Port = 443
   }
 
+  if($Global:TDDCPort) { $uri.Port = $Global:TDDCPort }
+
   if( -Not [System.String]::IsNullOrEmpty($Query) ) 
   {
     $uri.Query = $Query
@@ -178,7 +199,8 @@ function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [S
 
   if( -Not [System.String]::IsNullOrEmpty($Body) ) 
   {
-    $call['Body'] = $Body
+    $Utf8 = New-Object System.Text.utf8encoding 
+    $call['Body'] = $Utf8.GetString($Utf8.GetBytes($Body))
   }
 
   return $call

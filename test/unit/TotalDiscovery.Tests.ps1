@@ -45,6 +45,29 @@ Describe "Connect-TDDC" `
       $Global:TDDCToken = $null
     }
 
+    It "Should set the connection port" `
+    {
+      Connect-TDDC -Port 1234
+
+      $Global:TDDCPort.should.be(1234)
+
+      $Global:TDDCPort = $null
+    }
+
+    It "Should set the protocol" `
+    { 
+      $PreTestProtocol = $Global:TDDCProtocol
+      Connect-TDDC -Protocol 'https'
+
+      $Global:TDDCProtocol.should.be('https')
+
+      Connect-TDDC -Protocol 'http'
+
+      $Global:TDDCProtocol.should.be('http')
+
+      $Global:TDDCProtocol = $PreTestProtocol
+    }
+
     It "Should set both the server and auth token" `
     {
       Connect-TDDC -AuthToken abc123 -Server www.google.com
