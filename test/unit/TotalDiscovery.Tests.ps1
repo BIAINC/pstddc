@@ -106,6 +106,15 @@ Describe "Get-TDDCHeaders" `
   
 }
 
+Describe "New-TdCall" `
+{
+  It 'Should convert encoding to UTF8' `
+  {
+    $tdCall = New-TdCall -Method "Post" -Resource @( "collections", "create_automated_collections" ) -Body (Get-Content './test/mock_data/codepage-1252' -Encoding String )
+    $tdCall['Body'][0].should.be(195)
+    $tdCall['Body'][1].should.be(177)
+  }
+}
 
 Describe "Get-TDDCContentType" `
 {

@@ -199,8 +199,8 @@ function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [S
 
   if( -Not [System.String]::IsNullOrEmpty($Body) ) 
   {
-    $Utf8 = New-Object System.Text.utf8encoding 
-    $call['Body'] = $Utf8.GetString($Utf8.GetBytes($Body))
+    $Utf8 = New-Object System.Text.utf8encoding
+    $call['Body'] = $Utf8.GetBytes($Body)
   }
 
   return $call
