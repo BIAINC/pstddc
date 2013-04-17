@@ -1,8 +1,14 @@
 # Copyright © 2013 Business Intelligence Associates, Inc.
 # All Rights Reserved
 
-Set-Variable -Name 'TDDCServer' -Value 'app.totaldiscovery.com' -Scope Global
-Set-Variable -Name 'TDDCProtocol' -Value 'https' -Scope Global
+if ( [System.String]::IsNullOrEmpty($TDDCServer))
+{
+  Set-Variable -Name 'TDDCServer' -Value 'app.totaldiscovery.com' -Scope Global
+}
+if ( [System.String]::IsNullOrEmpty($TDDCProtocol))
+{
+  Set-Variable -Name 'TDDCProtocol' -Value 'https' -Scope Global
+}
 
 function Connect-TDDC()
 {
@@ -15,10 +21,34 @@ function Connect-TDDC()
 
   [Parameter( Position=1)]
   [String]
-  $Server)
+  $Server,
 
+  [Parameter( Position=2)]
+  [String]
+  $Protocol,
+
+  [Parameter( Position=3)]
+  [Int]
+  $Port)
+
+    if ([System.String]::IsNullOrEmpty($AuthToken) -and [System.String]::IsNullOrEmpty($Global::TDDCToken))
+    {
+      Write-Error "You must spefic an authentication token"
+    }
+    
     if (-not [System.String]::IsNullOrEmpty($AuthToken)) { Set-Variable -Name 'TDDCToken' -Value $AuthToken -Scope Global }
     if (-not [System.String]::IsNullOrEmpty($Server)) { Set-Variable -Name 'TDDCServer' -Value $Server -Scope Global } 
+    
+    if (-not [System.String]::IsNullOrEmpty($Protocol))
+    {
+      if ( -not ( $Protocol -imatch 'http' -or $Protocol -imatch 'https' ) )
+      {
+        Write-Error "The protocol must be http or https. $Protocol is invalid"
+      } 
+      Set-Variable -Name 'TDDCProtocol' -Value $Protocol -Scope Global 
+    }
+    
+    if (-not [System.String]::IsNullOrEmpty($Port)) { Set-Variable -Name 'TDDCPort' -Value $Port -Scope Global }
 
 }
 
@@ -40,7 +70,7 @@ function Get-TDDCHeaders()
     throw (new-object System.ArgumentException("You must specify an auth-token before you can make requests to TotalDiscovery.com"))
   }
 
-  return @{"X-AUTH-TOKEN"= (Get-TDDCToken) }
+  return @{"X-AUTH-TOKEN"= (Get-TDDCToken); "X-CLIENT-NAME" = 'PsTDDC' }
 }
 
 function Get-TDDCContentType()
@@ -54,8 +84,8 @@ function Read-TDDCPagingRestService
   (
   [Parameter( Mandatory=$true,
           Position=0)]
-  [String]
-  $EndPoint,
+  [String[]]
+  $Resource,
 
   [Parameter( Mandatory=$false,
           Position=1)]
@@ -68,21 +98,13 @@ function Read-TDDCPagingRestService
   $headers = Get-TDDCHeaders
 
   do {
+    $query = "$($uri.query)&limit=$pageSize&offset=$offset"
+    $tdCall = New-TdCall -Method "Get" -Resource $Resource -Query $query
     
-    $uri = New-Object System.UriBuilder("http://$(Get-TDDCServer)/$endPoint")
-    $uri.Query = "$($uri.query)&limit=$pageSize&offset=$offset"
-    if( $Global:TDDCProtocol -eq 'http' )
-    {
-      $uri.Scheme = "http"
-      $uri.Port = 80
-    } else {
-      $uri.Scheme = "https"
-      $uri.Port = 443
-    }
-
-    $enumerable =  Split-Path $uri.Path -Leaf 
-
-    $response = Invoke-RestMethod -Uri $uri.Uri -Header (Get-TDDCHeaders) -Method Get -ContentType (Get-TDDCContentType)
+    $uriBuilder = New-Object System.UriBuilder( $tdCall['Uri'] )
+    $enumerable =  Split-Path $uriBuilder.Path -Leaf 
+    
+    $response = Invoke-TdCall $tdCall
     $response.$enumerable | % {
         Write-Output $_
         $offset++
@@ -122,8 +144,8 @@ function Get-Custodians()
   PROCESS {
     switch ($PsCmdlet.ParameterSetName) 
       { 
-      "byMatter"  {  Read-TDDCPagingRestService -endPoint "/api/v1/matters/$matter/custodians" -pageSize $pageSize; break } 
-      "byCompany"  {  Read-TDDCPagingRestService -endPoint "/api/v1/companies/$company/custodians" -pageSize $pageSize; break } 
+      "byMatter"  {  Read-TDDCPagingRestService -Resource @( "matters","$matter","custodians") -PageSize $pageSize; break } 
+      "byCompany"  {  Read-TDDCPagingRestService -Resource @( "companies", "$company", "custodians" ) -PageSize $pageSize; break } 
       } 
   }
   
@@ -140,6 +162,94 @@ function Read-ResponseFromException
     $Encode = new-object System.Text.UTF8Encoding
     $response = $Encode.GetString($rs.ToArray())
     return $response
+}
+
+function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [String] $Body )
+{
+  Write-Verbose "New-TdCall"
+  Write-Verbose " -Verb: $method"
+  Write-Verbose " -Resources: $Resource"
+  Write-Verbose " -Query: $Query"
+  Write-Verbose " -Body: $Body"
+
+  $uriString = "http://$(Get-TDDCServer)/api/v1"
+  foreach( $resourcePart in $resource )
+  {
+    $uriString += "/" + $resourcePart
+  }
+
+  $uri = New-Object System.UriBuilder($uriString)
+  if( $Global:TDDCProtocol -eq 'http' )
+  {
+    $uri.Scheme = "http"
+    $uri.Port = 80
+  } else {
+    $uri.Scheme = "https"
+    $uri.Port = 443
+  }
+
+  if($Global:TDDCPort) { $uri.Port = $Global:TDDCPort }
+
+  if( -Not [System.String]::IsNullOrEmpty($Query) ) 
+  {
+    $uri.Query = $Query
+  }
+  Write-Verbose " -Uri: $uri"
+  $call = @{
+    'Uri' = $uri.Uri;
+    'Header' = (Get-TDDCHeaders);
+    'ContentType' = (Get-TDDCContentType);
+    'Method'= $method
+  }
+
+  if( -Not [System.String]::IsNullOrEmpty($Body) ) 
+  {
+    $Utf8 = New-Object System.Text.utf8encoding
+    $call['Body'] = $Utf8.GetBytes($Body)
+  }
+
+  return $call
+}
+
+function Invoke-TdCall( [Hashtable] $tdCall)
+{
+  try {
+    Write-Verbose "Calling server with $($tdCall|Out-String)"
+   
+    $response = Invoke-RestMethod @tdCall
+    return $response
+  }
+  catch [System.Net.WebException]
+  {
+    Write-Verbose "Error: $_"
+    
+    $response= Read-ResponseFromException -e $_
+    $json = ConvertFrom-JSON $response
+
+    if($_.exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::Unauthorized)
+    {
+      Write-Error -Message "Your credentials are invalid or you are not allowed to perform this operation, please check your credentials and try again" -Exception $_.exception
+    } elseif ($_.exception.Response.StatusCode.ToString() -eq '422'){
+      $json.errors | % {
+        $item = $_.email
+          $_.issues | % {
+            $message = ''
+            $issue = $_
+            $issue | gm | where { $_.MemberType -eq 'NoteProperty' } | % {
+              $property = $_.Name
+              $value = $issue.$property
+              $issue.$subject | % {
+                $message = "$message $property $value; "
+              }
+            }
+            Write-Warning "$item : $message"
+          }
+        
+      }
+    } else {
+      Write-Error -Message "An unknown error occourred: $($_.exception.message)"
+    }
+  }
 }
 
 function Set-Custodian
@@ -222,7 +332,6 @@ function Set-Custodian
 
   Begin 
   {
-    $headers = Get-TDDCHeaders
     switch ($PsCmdlet.ParameterSetName) 
       { 
       "byMatter"  { 
@@ -240,63 +349,11 @@ function Set-Custodian
 
     function Send-CustodianBatch($custodians, $api_name, $id, $headers)
     {
-      try {
+      $custodians = @{'custodians' = $custodians}
+      $body = (ConvertTo-Json $custodians)
 
-        $uri = New-Object System.UriBuilder("http://$(Get-TDDCServer)/api/v1/$api_name/$id/custodians.json")
-
-        if( $Global:TDDCProtocol -eq 'http' )
-        {
-          $uri.Scheme = "http"
-          $uri.Port = 80
-        } else {
-          $uri.Scheme = "https"
-          $uri.Port = 443
-        }
-
-
-        $custodians = @{'custodians' = $custodians}
-        $body = (ConvertTo-Json $custodians)
-
-        Write-Verbose "Calling $uri"
-        Write-Verbose " - Verb: POST"
-        Write-Verbose " - Body: "
-        Write-verbose "$body"
-
-        $response = Invoke-RestMethod -Uri $uri.Uri -Header $headers -Method Post -ContentType (Get-TDDCContentType) -Body $body;
-        
-      }
-      catch [System.Net.WebException]
-      {
-        Write-Verbose "Error: $_"
-        
-        $response= Read-ResponseFromException -e $_
-        $json = ConvertFrom-JSON $response
-
-        if($_.exception.Response.StatusCode -eq [System.Net.HttpStatusCode]::Unauthorized)
-        {
-          Write-Error -Message "Your credentials are invalid or you are not allowed to perform this operation, please check your credentials and try again" -Exception $_.exception
-        } elseif ($_.exception.Response.StatusCode.ToString() -eq '422'){
-          $json.errors | % {
-            $item = $_.email
-              $_.issues | % {
-                $message = ''
-                $issue = $_
-                $issue | gm | where { $_.MemberType -eq 'NoteProperty' } | % {
-                  $property = $_.Name
-                  $value = $issue.$property
-                  $issue.$subject | % {
-                    $message = "$message $property $value; "
-                  }
-                }
-                Write-Warning "$item : $message"
-              }
-            
-          }
-        } else {
-          Write-Error -Message "An unknown error occourred: $($_.exception.message)"
-        }
-        
-      }
+      $tdCall = New-TdCall -Method "Post" -Resource @( $api_name, $id, "custodians.json" ) -Body $body
+      Invoke-TdCall $tdCall  
     }
 
   }
@@ -343,3 +400,58 @@ function Set-Custodian
 
 }
 
+function Add-Collection 
+{
+  [CmdletBinding()]
+  param(
+    [Parameter( Mandatory=$true,
+                Position=0)]
+    [String]
+    [alias("MatterID")]
+    $Matter,
+
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+    [alias("id")]
+    [String]
+    $CustodianId,
+
+    [Int]
+    $BatchSize = 100
+  )
+
+  Begin 
+  {
+    $custodians = @()
+
+    function Send-CustodianBatch()
+    {
+      $collection_options = @{
+        'custodian_ids' = $custodians
+        'matter_id' = $matter
+      }
+      $body = (ConvertTo-Json $collection_options)
+
+      $tdCall = New-TdCall -Method "Post" -Resource @( "collections", "create_automated_collections" ) -Body $body
+      Invoke-TdCall $tdCall  
+    }
+
+  }
+
+  Process
+  {
+    $custodians += $CustodianId
+    if($custodians.count -eq $batchSize)
+    {
+      Send-CustodianBatch
+      $custodians = @()
+    } 
+  }
+
+  End 
+  { 
+    if($custodians.count -ne 0)
+    {
+      Send-CustodianBatch
+    }
+  }
+}
