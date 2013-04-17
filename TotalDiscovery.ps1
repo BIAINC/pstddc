@@ -31,6 +31,11 @@ function Connect-TDDC()
   [Int]
   $Port)
 
+    if ([System.String]::IsNullOrEmpty($AuthToken) -and [System.String]::IsNullOrEmpty($Global::TDDCToken))
+    {
+      Write-Error "You must spefic an authentication token"
+    }
+    
     if (-not [System.String]::IsNullOrEmpty($AuthToken)) { Set-Variable -Name 'TDDCToken' -Value $AuthToken -Scope Global }
     if (-not [System.String]::IsNullOrEmpty($Server)) { Set-Variable -Name 'TDDCServer' -Value $Server -Scope Global } 
     
