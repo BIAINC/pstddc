@@ -23,16 +23,13 @@ Describe "Connect-TDDC" `
 
     It "Should set the server to another address" `
     {
-      Connect-TDDC -Server www.google.com
-
-      if($Global:TDDCAuthToken -ne $null)
-      {
-        throw New-Object PesterFailure($null, $Global:TDDCAuthToken)
-      }
+      Connect-TDDC -Server www.google.com -AuthToken abc123
 
       $Global:TDDCServer.should.be('www.google.com')
+      Global:TDDCToken.should.be('abc123')
 
       $Global:TDDCServer = 'app.totaldiscovery.com'
+      $Global:TDDCToken = $null
 
     }
 
