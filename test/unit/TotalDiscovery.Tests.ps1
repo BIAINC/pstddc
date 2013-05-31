@@ -26,7 +26,7 @@ Describe "Connect-TDDC" `
       Connect-TDDC -Server www.google.com -AuthToken abc123
 
       $Global:TDDCServer.should.be('www.google.com')
-      Global:TDDCToken.should.be('abc123')
+      $Global:TDDCToken.should.be('abc123')
 
       $Global:TDDCServer = 'app.totaldiscovery.com'
       $Global:TDDCToken = $null
@@ -44,7 +44,7 @@ Describe "Connect-TDDC" `
 
     It "Should set the connection port" `
     {
-      Connect-TDDC -Port 1234
+      Connect-TDDC -Port 1234 -AuthToken abc123
 
       $Global:TDDCPort.should.be(1234)
 
@@ -54,11 +54,11 @@ Describe "Connect-TDDC" `
     It "Should set the protocol" `
     { 
       $PreTestProtocol = $Global:TDDCProtocol
-      Connect-TDDC -Protocol 'https'
+      Connect-TDDC -Protocol 'https' -AuthToken abc123
 
       $Global:TDDCProtocol.should.be('https')
 
-      Connect-TDDC -Protocol 'http'
+      Connect-TDDC -Protocol 'http' -AuthToken abc123
 
       $Global:TDDCProtocol.should.be('http')
 
