@@ -35,19 +35,19 @@ function Connect-TDDC()
     {
       Write-Error "You must spefic an authentication token"
     }
-    
+
     if (-not [System.String]::IsNullOrEmpty($AuthToken)) { Set-Variable -Name 'TDDCToken' -Value $AuthToken -Scope Global }
-    if (-not [System.String]::IsNullOrEmpty($Server)) { Set-Variable -Name 'TDDCServer' -Value $Server -Scope Global } 
-    
+    if (-not [System.String]::IsNullOrEmpty($Server)) { Set-Variable -Name 'TDDCServer' -Value $Server -Scope Global }
+
     if (-not [System.String]::IsNullOrEmpty($Protocol))
     {
       if ( -not ( $Protocol -imatch 'http' -or $Protocol -imatch 'https' ) )
       {
         Write-Error "The protocol must be http or https. $Protocol is invalid"
-      } 
-      Set-Variable -Name 'TDDCProtocol' -Value $Protocol -Scope Global 
+      }
+      Set-Variable -Name 'TDDCProtocol' -Value $Protocol -Scope Global
     }
-    
+
     if (-not [System.String]::IsNullOrEmpty($Port)) { Set-Variable -Name 'TDDCPort' -Value $Port -Scope Global }
 
 }
@@ -100,19 +100,73 @@ function Read-TDDCPagingRestService
   do {
     $query = "$($uri.query)&limit=$pageSize&offset=$offset"
     $tdCall = New-TdCall -Method "Get" -Resource $Resource -Query $query
-    
+
     $uriBuilder = New-Object System.UriBuilder( $tdCall['Uri'] )
-    $enumerable =  Split-Path $uriBuilder.Path -Leaf 
-    
+    $enumerable =  Split-Path $uriBuilder.Path -Leaf
+
     $response = Invoke-TdCall $tdCall
-    $response.$enumerable | % {
-        Write-Output $_
-        $offset++
-      }
-    } while (($response.$enumerable).count -ne 0)
+    if ( $response -is [system.array]) {
+        $response | % {
+            Write-Output $_
+        }
+    } else {
+
+        $response.$enumerable | % {
+            Write-Output $_
+            $offset++
+          }
+    }
+} while (($response.$enumerable).count -ne 0)
 
 }
 
+
+function Read-TDDCRestService
+{
+  param
+  (
+  [Parameter( Mandatory=$true,
+          Position=0)]
+  [String[]]
+  $Resource
+  )
+  PROCESS {
+  $headers = Get-TDDCHeaders
+  $tdCall = New-TdCall -Method "Get" -Resource $Resource -Query ""
+  $response = Invoke-TdCall $tdCall
+  Read-TDDCResponse -Uri $tdCall['Uri'] -Response $response
+  }
+
+}
+
+function Read-TDDCResponse() {
+      param
+  (
+  [Parameter( Mandatory=$true,
+          Position=0)]
+  [String]
+  $Uri,
+
+  [Parameter( Mandatory=$true,
+          Position=1)]
+  [AllowNull()]
+  $Response
+  )
+  PROCESS {
+      $uriBuilder = New-Object System.UriBuilder( $Uri )
+      $enumerable =  Split-Path $uriBuilder.Path -Leaf
+      if ($Response -eq $null) {
+        return
+      }
+
+      if ( $Response -is [system.array]) {
+        $Reader = $Response
+      } else {
+          $Reader = $Response.$enumerable
+      }
+      $Reader | % { if( $_ -ne $null) { Write-Output $_ } }
+    }
+}
 
 function Get-Custodians()
 {
@@ -142,13 +196,13 @@ function Get-Custodians()
   )
 
   PROCESS {
-    switch ($PsCmdlet.ParameterSetName) 
-      { 
-      "byMatter"  {  Read-TDDCPagingRestService -Resource @( "matters","$matter","custodians") -PageSize $pageSize; break } 
-      "byCompany"  {  Read-TDDCPagingRestService -Resource @( "companies", "$company", "custodians" ) -PageSize $pageSize; break } 
-      } 
+    switch ($PsCmdlet.ParameterSetName)
+      {
+      "byMatter"  {  Read-TDDCPagingRestService -Resource @( "matters","$matter","custodians") -PageSize $pageSize; break }
+      "byCompany"  {  Read-TDDCPagingRestService -Resource @( "companies", "$company", "custodians" ) -PageSize $pageSize; break }
+      }
   }
-  
+
 }
 
 function Read-ResponseFromException
@@ -190,7 +244,7 @@ function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [S
 
   if($Global:TDDCPort) { $uri.Port = $Global:TDDCPort }
 
-  if( -Not [System.String]::IsNullOrEmpty($Query) ) 
+  if( -Not [System.String]::IsNullOrEmpty($Query) )
   {
     $uri.Query = $Query
   }
@@ -202,7 +256,7 @@ function New-TdCall( [String] $Method, [string[]] $Resource, [String] $Query, [S
     'Method'= $method
   }
 
-  if( -Not [System.String]::IsNullOrEmpty($Body) ) 
+  if( -Not [System.String]::IsNullOrEmpty($Body) )
   {
     $Utf8 = New-Object System.Text.utf8encoding
     $call['Body'] = $Utf8.GetBytes($Body)
@@ -215,14 +269,14 @@ function Invoke-TdCall( [Hashtable] $tdCall)
 {
   try {
     Write-Verbose "Calling server with $($tdCall|Out-String)"
-   
+
     $response = Invoke-RestMethod @tdCall
     return $response
   }
   catch [System.Net.WebException]
   {
     Write-Verbose "Error: $_"
-    
+
     $response= Read-ResponseFromException -e $_
     $json = ConvertFrom-JSON $response
 
@@ -244,7 +298,7 @@ function Invoke-TdCall( [Hashtable] $tdCall)
             }
             Write-Warning "$item : $message"
           }
-        
+
       }
     } else {
       Write-Error -Message "An unknown error occourred: $($_.exception.message)"
@@ -330,18 +384,18 @@ function Set-Custodian
 
   )
 
-  Begin 
+  Begin
   {
-    switch ($PsCmdlet.ParameterSetName) 
-      { 
-      "byMatter"  { 
+    switch ($PsCmdlet.ParameterSetName)
+      {
+      "byMatter"  {
         $id = $matter
         $api_name = 'matters'
-        break; } 
-      "byCompany"  { 
+        break; }
+      "byCompany"  {
         $id = $company
         $api_name = 'companies'
-        break } 
+        break }
       }
 
     $custodians = @()
@@ -353,7 +407,7 @@ function Set-Custodian
       $body = (ConvertTo-Json $custodians)
 
       $tdCall = New-TdCall -Method "Post" -Resource @( $api_name, $id, "custodians.json" ) -Body $body
-      Invoke-TdCall $tdCall  
+      Invoke-TdCall $tdCall
     }
 
   }
@@ -362,8 +416,8 @@ function Set-Custodian
   {
 
     $custodian = @{"name" = $name; "email" = $emailaddress; "phone" = $officephone; "title" = $title; "location" = $office; "department" = $department; "notes" = $notes; "first_name" = $GivenName; "last_name" = $Surname; "supervisor_name" = $supervisorName; "supervisor_email" = $supervisorEmail}
-    
-    if ( ($input) -and ($input.Manager) -and $input.Manager.StartsWith("CN=")) 
+
+    if ( ($input) -and ($input.Manager) -and $input.Manager.StartsWith("CN="))
     {
       Write-Verbose "Looking up manager $($input.Manger)"
       try {
@@ -379,7 +433,7 @@ function Set-Custodian
     $keys | % { if ($custodian.$_ -eq $null ) {$custodian.Remove($_)} }
 
     Write-Host "Processing $($custodian['Name'])"
-    
+
     $custodians = $custodians + $custodian
     if($custodians.count -eq $batchSize)
     {
@@ -396,11 +450,11 @@ function Set-Custodian
       Send-CustodianBatch $custodians $api_name $id $headers
     }
 
-  }  
+  }
 
 }
 
-function Add-Collection 
+function Add-Collection
 {
   [CmdletBinding()]
   param(
@@ -419,7 +473,7 @@ function Add-Collection
     $BatchSize = 100
   )
 
-  Begin 
+  Begin
   {
     $custodians = @()
 
@@ -432,7 +486,7 @@ function Add-Collection
       $body = (ConvertTo-Json $collection_options)
 
       $tdCall = New-TdCall -Method "Post" -Resource @( "collections", "create_automated_collections" ) -Body $body
-      Invoke-TdCall $tdCall  
+      Invoke-TdCall $tdCall
     }
 
   }
@@ -444,14 +498,109 @@ function Add-Collection
     {
       Send-CustodianBatch
       $custodians = @()
-    } 
+    }
   }
 
-  End 
-  { 
+  End
+  {
     if($custodians.count -ne 0)
     {
       Send-CustodianBatch
     }
+  }
+}
+
+
+function Get-Matters()
+{
+  [CmdletBinding()]
+  param
+  (
+  [Parameter( Mandatory=$true,
+              Position=0,
+              ValueFromPipeline = $true,
+              ValueFromPipelineByPropertyName = $true)]
+  [String]
+  $Company
+  )
+
+  PROCESS {
+    Read-TDDCRestService -Resource @( "companies","$Company","matters")
+  }
+
+}
+
+function Get-LegalHolds()
+{
+  [CmdletBinding()]
+  param
+  (
+  [Parameter( Mandatory=$true,
+              Position=0,
+              ValueFromPipelineByPropertyName = $true)]
+  [Alias('id', 'matter_id')]
+  [String]
+  $Matter
+  )
+
+  PROCESS {
+    Read-TDDCRestService -Resource @( "matters","$Matter","legal_holds")
+  }
+
+}
+
+function Convert-LegalHoldToCustodians()
+{
+  param
+  (
+  [CmdletBinding()]
+  [Parameter( Mandatory=$true,
+              ValueFromPipeline = $true,
+              Position=0)]
+  $LegalHold
+  )
+
+  PROCESS {
+    $LegalHold.custodians_legal_holds | % {
+      $custodian = $_.custodian
+      $custodian | Add-Member @{legal_hold_name=$LegalHold.name;legal_hold_id=$LegalHold.id;legal_hold_status=$_.legal_hold_status.name;}
+      Write-Output $custodian
+    }
+  }
+}
+
+function Group-LegalHoldsByCustodian()
+{
+  param
+  (
+  [CmdletBinding()]
+  [Parameter( Mandatory=$true,
+              ValueFromPipeline = $true,
+              Position=0)]
+  $CustodianStatus
+  )
+
+  BEGIN {
+    $CustodianHash = @{}
+  }
+
+  PROCESS {
+    if(-not $CustodianHash.ContainsKey($CustodianStatus.email)) {
+        $CustodianStatus | Add-Member @{legal_holds=@()}
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name released_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -eq 'legalhold.statuses.released' } }
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name active_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -ne 'legalhold.statuses.released' } }
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_on_hold -Value { -not $this.is_released_from_hold }
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_released_from_hold -Value { $this.released_holds.count -ne 0 -and $this.active_holds.count -eq 0 }
+        $CustodianHash[$CustodianStatus.email] = $CustodianStatus
+    }
+    $MasterStatus = $CustodianHash[$CustodianStatus.email]
+    $MasterStatus.legal_holds += @{legal_hold_name=$CustodianStatus.legal_hold_name;legal_hold_status=$CustodianStatus.legal_hold_status;legal_hold_id=$CustodianStatus.legal_hold_id }
+    $CustodianStatus.PSObject.Properties.Remove('legal_hold_name')
+    $CustodianStatus.PSObject.Properties.Remove('legal_hold_status')
+    $CustodianStatus.PSObject.Properties.Remove('legal_hold_id')
+  }
+
+  END {
+    $CustodianHash.Values | % { Write-Output $_ }
   }
 }
