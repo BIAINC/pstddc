@@ -109,6 +109,8 @@ function Read-TDDCPagingRestService
         $response | % {
             Write-Output $_
         }
+    } elseif ($Response.$enumerable -eq $null) {
+      Write-Output $_
     } else {
 
         $response.$enumerable | % {
@@ -161,10 +163,16 @@ function Read-TDDCResponse() {
 
       if ( $Response -is [system.array]) {
         $Reader = $Response
-      } else {
-          $Reader = $Response.$enumerable
+      } elseif ($Response.$enumerable -ne $null) {
+        $Reader = $Response.$enumerable
       }
-      $Reader | % { if( $_ -ne $null) { Write-Output $_ } }
+
+      if ($Reader -eq $null) {
+        Write-Output $Response
+      } else {
+        $Reader | % { if( $_ -ne $null) { Write-Output $_ } }
+      }
+
     }
 }
 
