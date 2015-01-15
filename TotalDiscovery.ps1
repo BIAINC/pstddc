@@ -612,3 +612,21 @@ function Group-LegalHoldsByCustodian()
     $CustodianHash.Values | % { Write-Output $_ }
   }
 }
+
+function Update-TDDCTools()
+{
+  param
+  (
+    [CmdletBinding()]
+    [Parameter( Mandatory=$false,
+    Position=0)]
+    $Version
+  )
+  PROCESS {
+    if ($Version -ne $null) {
+      Invoke-Expression (Invoke-WebRequest "https://s3.amazonaws.com/pstddc/ci/$Version/Install.ps1" -UseBasicParsing).Content
+    } else {
+      Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/Install.ps1 -UseBasicParsing).Content
+    }
+  }
+}
