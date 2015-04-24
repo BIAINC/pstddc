@@ -571,7 +571,7 @@ function Convert-LegalHoldToCustodians()
   PROCESS {
     $LegalHold.custodians_legal_holds | % {
       $custodian = $_.custodian
-      $custodian | Add-Member @{legal_hold_name=$LegalHold.name;legal_hold_id=$LegalHold.id;legal_hold_status=$_.legal_hold_status.name;}
+      $custodian | Add-Member @{matter_id=$LegalHold.matter.id;legal_hold_name=$LegalHold.name;legal_hold_id=$LegalHold.id;legal_hold_status=$_.legal_hold_status.name;}
       Write-Output $custodian
     }
   }
