@@ -571,7 +571,7 @@ function Convert-LegalHoldToCustodians()
   PROCESS {
     $LegalHold.custodians_legal_holds | % {
       $custodian = $_.custodian
-      $custodian | Add-Member @{legal_hold_name=$LegalHold.name;legal_hold_id=$LegalHold.id;legal_hold_status=$_.legal_hold_status.name;}
+      $custodian | Add-Member @{matter_id=$LegalHold.matter.id;legal_hold_name=$LegalHold.name;legal_hold_id=$LegalHold.id;legal_hold_status=$_.legal_hold_status.name;}
       Write-Output $custodian
     }
   }
@@ -594,18 +594,23 @@ function Group-LegalHoldsByCustodian()
 
   PROCESS {
     if(-not $CustodianHash.ContainsKey($CustodianStatus.email)) {
-        $CustodianStatus | Add-Member @{legal_holds=@()}
-        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name released_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -eq 'legalhold.statuses.released' } }
-        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name active_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -ne 'legalhold.statuses.released' } }
-        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_on_hold -Value { -not $this.is_released_from_hold }
-        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_released_from_hold -Value { $this.released_holds.count -ne 0 -and $this.active_holds.count -eq 0 }
-        $CustodianHash[$CustodianStatus.email] = $CustodianStatus
+        $CustodianStatus | Add-Member @{legal_holds=@()} -Force
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name released_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -eq 'legalhold.statuses.released' } } -Force
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name active_holds -Value { $this.legal_holds |  where { $_.legal_hold_status -ne 'legalhold.statuses.released' } } -Force
+        $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_released_from_hold -Value { $this.released_holds.count -ne 0 -and $this.active_holds.count -eq 0 } -Force
+    $CustodianStatus | Add-Member -MemberType ScriptProperty -Name is_on_hold -Value { -not $this.is_released_from_hold } -Force
+        $CustodianStatus | Add-Member -MemberType NoteProperty -Name legal_holds -Value ([System.Collections.ArrayList]@()) -Force
+    $CustodianHash[$CustodianStatus.email] = $CustodianStatus
     }
     $MasterStatus = $CustodianHash[$CustodianStatus.email]
-    $MasterStatus.legal_holds += @{legal_hold_name=$CustodianStatus.legal_hold_name;legal_hold_status=$CustodianStatus.legal_hold_status;legal_hold_id=$CustodianStatus.legal_hold_id }
-    $CustodianStatus.PSObject.Properties.Remove('legal_hold_name')
-    $CustodianStatus.PSObject.Properties.Remove('legal_hold_status')
-    $CustodianStatus.PSObject.Properties.Remove('legal_hold_id')
+
+  if ($MasterStatus -ne $null) {
+    
+      $MasterStatus.legal_holds.Add(@{matter_id=$CustodianStatus.matter_id;legal_hold_name=$CustodianStatus.legal_hold_name;legal_hold_status=$CustodianStatus.legal_hold_status;legal_hold_id=$CustodianStatus.legal_hold_id })
+      $CustodianStatus.PSObject.Properties.Remove('legal_hold_name')
+      $CustodianStatus.PSObject.Properties.Remove('legal_hold_status')
+      $CustodianStatus.PSObject.Properties.Remove('legal_hold_id')
+  }
   }
 
   END {
