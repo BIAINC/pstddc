@@ -1,4 +1,4 @@
-# Copyright © 2013 Business Intelligence Associates, Inc.
+# Copyright © 2015 Business Intelligence Associates, Inc.
 # All Rights Reserved
 
 if ( [System.String]::IsNullOrEmpty($TDDCServer))
@@ -387,6 +387,34 @@ function Set-Custodian
     [String]
     $SupervisorEmail,
 
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $EmployeeID,
+    
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $Function,
+    
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $Business,
+	
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $Country,
+    
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $EmployeeType,
+    
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $EmployeeStatusChangedAt,
+    
+    [Parameter( ValueFromPipelineByPropertyName = $true)]
+      [String]
+      $EmployeeStatus,
+
     [Int]
     $BatchSize = 100
 
@@ -423,7 +451,26 @@ function Set-Custodian
   Process
   {
 
-    $custodian = @{"name" = $name; "email" = $emailaddress; "phone" = $officephone; "title" = $title; "location" = $office; "department" = $department; "notes" = $notes; "first_name" = $GivenName; "last_name" = $Surname; "supervisor_name" = $supervisorName; "supervisor_email" = $supervisorEmail}
+    $custodian = @{
+		"name" = $name; 
+		"email" = $emailaddress; 
+		"phone" = $officephone; 
+		"title" = $title; 
+		"location" = $office;
+		"department" = $department; 
+		"notes" = $notes; 
+		"first_name" = $GivenName; 
+		"last_name" = $Surname; 
+		"supervisor_name" = $supervisorName; 
+		"supervisor_email" = $supervisorEmail;
+		"employee_id" = $employeeID;
+		"function" = $function;
+		"business" = $business;
+		"country" = $country;
+		"employee_type" = $EmployeeType;
+		"employee_status" = $EmployeeStatus;
+		"employee_status_changed_at" = $EmployeeStatusChangedAt
+		}
 
     if ( ($input) -and ($input.Manager) -and $input.Manager.StartsWith("CN="))
     {
