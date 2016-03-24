@@ -1,4 +1,4 @@
-# Copyright © 2015 Business Intelligence Associates, Inc.
+# Copyright © 2016 TotalDiscovery, LLC
 # All Rights Reserved
 
 if ( [System.String]::IsNullOrEmpty($TDDCServer))
@@ -82,15 +82,13 @@ function Read-TDDCPagingRestService
 {
   param
   (
-  [Parameter( Mandatory=$true,
-          Position=0)]
-  [String[]]
-  $Resource,
+    [Parameter( Mandatory=$true, Position=0)]
+    [String[]]
+    $Resource,
 
-  [Parameter( Mandatory=$false,
-          Position=1)]
-  [Int]
-  $PageSize = 5
+    [Parameter( Mandatory=$false, Position=1)]
+    [Int]
+    $PageSize = 5
   )
 
 
@@ -127,11 +125,11 @@ function Read-TDDCRestService
 {
   param
   (
-  [Parameter( Mandatory=$true,
-          Position=0)]
-  [String[]]
-  $Resource
+    [Parameter( Mandatory=$true, Position=0)]
+    [String[]]
+    $Resource
   )
+  
   PROCESS {
   $headers = Get-TDDCHeaders
   $tdCall = New-TdCall -Method "Get" -Resource $Resource -Query ""
@@ -142,18 +140,17 @@ function Read-TDDCRestService
 }
 
 function Read-TDDCResponse() {
-      param
+  param
   (
-  [Parameter( Mandatory=$true,
-          Position=0)]
-  [String]
-  $Uri,
+    [Parameter( Mandatory=$true, Position=0)]
+    [String]
+    $Uri,
 
-  [Parameter( Mandatory=$true,
-          Position=1)]
-  [AllowNull()]
-  $Response
+    [Parameter( Mandatory=$true, Position=1)]
+    [AllowNull()]
+    $Response
   )
+  
   PROCESS {
       $uriBuilder = New-Object System.UriBuilder( $Uri )
       $enumerable =  Split-Path $uriBuilder.Path -Leaf
@@ -197,8 +194,7 @@ function Get-Custodians()
   [String]
   $Matter,
 
-  [Parameter( Mandatory=$false,
-              Position=1)]
+  [Parameter( Mandatory=$false, Position=1)]
   [Int]
   $PageSize = 5
   )
@@ -218,7 +214,8 @@ function Read-ResponseFromException
   param(
     [Parameter(Mandatory=$true,Position=0)]
     [System.Object]
-    $e)
+    $e
+  )
 
     $rs = $e.exception.response.GetResponseStream()
     $Encode = new-object System.Text.UTF8Encoding
@@ -317,8 +314,7 @@ function Invoke-TdCall( [Hashtable] $tdCall)
 function Set-Custodian
 {
   [CmdletBinding()]
-  param
-    (
+  param (
     [Parameter( Mandatory=$true,
                 Position=0,
                 ParameterSetName='byCompany')]
@@ -388,32 +384,32 @@ function Set-Custodian
     $SupervisorEmail,
 
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $EmployeeID,
+    [String]
+    $EmployeeID,
     
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $Function,
+    [String]
+    $Function,
     
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $Business,
-	
+    [String]
+    $Business,
+  
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $Country,
+    [String]
+    $Country,
     
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $EmployeeType,
+    [String]
+    $EmployeeType,
     
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $EmployeeStatusChangedAt,
+    [String]
+    $EmployeeStatusChangedAt,
     
     [Parameter( ValueFromPipelineByPropertyName = $true)]
-      [String]
-      $EmployeeStatus,
+    [String]
+    $EmployeeStatus,
 
     [Int]
     $BatchSize = 100
@@ -452,25 +448,25 @@ function Set-Custodian
   {
 
     $custodian = @{
-		"name" = $name; 
-		"email" = $emailaddress; 
-		"phone" = $officephone; 
-		"title" = $title; 
-		"location" = $office;
-		"department" = $department; 
-		"notes" = $notes; 
-		"first_name" = $GivenName; 
-		"last_name" = $Surname; 
-		"supervisor_name" = $supervisorName; 
-		"supervisor_email" = $supervisorEmail;
-		"employee_id" = $employeeID;
-		"function" = $function;
-		"business" = $business;
-		"country" = $country;
-		"employee_type" = $EmployeeType;
-		"employee_status" = $EmployeeStatus;
-		"employee_status_changed_at" = $EmployeeStatusChangedAt
-		}
+      "name" = $name; 
+      "email" = $emailaddress; 
+      "phone" = $officephone; 
+      "title" = $title; 
+      "location" = $office;
+      "department" = $department; 
+      "notes" = $notes; 
+      "first_name" = $GivenName; 
+      "last_name" = $Surname; 
+      "supervisor_name" = $supervisorName; 
+      "supervisor_email" = $supervisorEmail;
+      "employee_id" = $employeeID;
+      "function" = $function;
+      "business" = $business;
+      "country" = $country;
+      "employee_type" = $EmployeeType;
+      "employee_status" = $EmployeeStatus;
+      "employee_status_changed_at" = $EmployeeStatusChangedAt
+    }
 
     if ( ($input) -and ($input.Manager) -and $input.Manager.StartsWith("CN="))
     {
@@ -670,8 +666,7 @@ function Update-TDDCTools()
   param
   (
     [CmdletBinding()]
-    [Parameter( Mandatory=$false,
-    Position=0)]
+    [Parameter( Mandatory=$false, Position=0)]
     $Version
   )
   PROCESS {
@@ -679,6 +674,178 @@ function Update-TDDCTools()
       Invoke-Expression (Invoke-WebRequest "https://s3.amazonaws.com/pstddc/ci/$Version/Install.ps1" -UseBasicParsing).Content
     } else {
       Invoke-Expression (Invoke-WebRequest https://s3.amazonaws.com/pstddc/Install.ps1 -UseBasicParsing).Content
+    }
+  }
+}
+ 
+function Update-TDCustomerProperty() {
+  param(
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    Position=0)]
+    [int]
+    $Customer = 0,
+    
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true)]
+    [System.Collections.Hashtable]
+    $Values
+  )
+
+  $body = (ConvertTo-Json $Values)
+  $tdCall = New-TdCall -Method "PATCH" -Resource @( 'customers',"$Customer") -Body $body
+  Invoke-TdCall $tdCall
+  
+}
+
+function Get-TDDirectories()
+{
+  param
+  (
+    [CmdletBinding()]
+    [Parameter( Mandatory=$false,
+    Position=0,
+    ParameterSetName='default')]
+    [int]
+    $Directory = 0,
+  
+    [CmdletBinding()]
+    [Parameter( Mandatory=$false,
+    Position=1)]
+    [int]
+    $Customer = 0
+  )
+  PROCESS {
+    if($Directory -eq 0 -and $Customer -eq 0) {
+        Read-TDDCRestService -Resource @('directories')
+    } elseif ($Directory -eq 0 -and $CustomerID -ne 0) {
+      Read-TDDCRestService -Resource @('customers',"$Customer",'directories')
+    } elseif ($Directory -ne 0 -and $Customer -ne 0) {
+      Read-TDDCRestService -Resource @('customers',"$Customer",'directories',"$Directory")
+    } elseif ($Directory -ne 0 -and $Customer -eq 0) {
+      Read-TDDCRestService -Resource @('directories',"$Directory")
+    }
+  }
+
+}
+
+Add-Type -TypeDefinition @"
+   public enum UniqueIDType
+   {
+      none,
+      email,
+      employee_id
+   }
+"@
+
+function Create-TDDirectory()
+{
+  param
+  (
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    Position=0,
+    ParameterSetName='default')]
+    [int]
+    $Company,
+  
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    Position=1)]
+    [string]
+    $Name,
+  
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    Position=2)]
+    [UniqueIDType]
+    $UniqueID,
+  
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    ValueFromPipeline = $true,
+    Position=3)]
+    $Custodians
+  )
+  
+  BEGIN {
+    [System.Collections.ArrayList]$CustodianList = @()
+  }
+  
+  PROCESS {
+    if(Get-Member -inputobject $Custodians -name "id" -Membertype Properties){
+      $CustodianList.Add($_.id)
+    } elseif ($custodians -is [System.Array]) {
+      $CustodianList = $Custodians
+    } else {
+      $CustodianList.Add($custodian)
+    }
+  }
+  
+  END {
+    $parameters = @{
+    "customer_id" = $Customer;
+    "name" = $Name;
+    "unique_id_type" = "uid_$UniqueID";
+    "custodian_ids_to_move" = $CustodianList
+  }
+  
+    $body = (ConvertTo-Json $parameters)
+    $tdCall = New-TdCall -Method "Post" -Resource @( 'companies',"$Company",'directory' ) -Body $body
+    Invoke-TdCall $tdCall
+  }
+
+}
+
+function Get-AssignedCustodians() {
+  param(
+      [CmdletBinding()]
+      [Parameter( Mandatory=$true,
+      Position=0,
+      ParameterSetName='default')]
+      [int]
+      $Company
+  )
+  
+  Get-Matters -Company $Company| % { Get-Custodians -Matter $_.id | %{ Write-Output $_ } }
+}
+
+function Set-DirectoryType() {
+  param(
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true,
+    Position=0)]
+    [Parameter(ParameterSetName = "Customer")]
+    [Parameter(ParameterSetName = "Company")]
+    [int]
+    $Customer,
+    
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true, ParameterSetName = "Company", Position=1)]
+    [Switch]
+    $ToCompany,
+  
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true, ParameterSetName = "Customer", Position=1)]
+    [Switch]
+    $ToCustomer,
+    
+    [CmdletBinding()]
+    [Parameter( Mandatory=$true, ParameterSetName = "Customer",  Position=2)]
+    [int]
+    $Directory
+    
+  )
+  BEGIN {
+    switch ($PsCmdlet.ParameterSetName) {
+      "Company"  {  
+          Update-TDCustomerProperty -Customer $Customer -Values @{ 'delegate_clo' = $true } | Write-Output
+          break
+      }
+      "Customer"  {
+        Update-TDCustomerProperty -Customer $Customer -Values @{ 'delegate_clo' = $false; 'default_directory_id' = $Directory } | Write-Output
+        break
+      }
     }
   }
 }
