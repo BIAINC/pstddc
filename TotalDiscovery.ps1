@@ -278,7 +278,7 @@ function Invoke-TdCall( [Hashtable] $tdCall)
   try {
     Write-Verbose "Calling server with $($tdCall|Out-String)"
 
-    $response = Invoke-RestMethod @tdCall
+    $response = Invoke-RestMethod @tdCall -TimeoutSec 300
     return $response
   }
   catch [System.Net.WebException]
