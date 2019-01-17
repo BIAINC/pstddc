@@ -10,7 +10,7 @@ Describe "Connect-TDDC" `
    
     It "Should default production api" `
     {
-      $Global:TDDCServer.should.be('app.totaldiscovery.com')   
+      $Global:TDDCServer.should.be('preserve.catalystsecure.com')   
     }
 
     It "Should default to a null token" `
@@ -28,7 +28,7 @@ Describe "Connect-TDDC" `
       $Global:TDDCServer.should.be('www.google.com')
       $Global:TDDCToken.should.be('abc123')
 
-      $Global:TDDCServer = 'app.totaldiscovery.com'
+      $Global:TDDCServer = 'preserve.catalystsecure.com'
       $Global:TDDCToken = $null
 
     }
@@ -73,7 +73,7 @@ Describe "Connect-TDDC" `
       $Global:TDDCServer.should.be('www.google.com')
       
       $Global:TDDCToken = $null
-      $Global:TDDCServer = 'app.totaldiscovery.com'
+      $Global:TDDCServer = 'preserve.catalystsecure.com'
     }
   }
 }
