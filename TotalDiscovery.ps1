@@ -3,7 +3,7 @@
 
 if ( [System.String]::IsNullOrEmpty($TDDCServer))
 {
-  Set-Variable -Name 'TDDCServer' -Value 'app.totaldiscovery.com' -Scope Global
+  Set-Variable -Name 'TDDCServer' -Value 'preserve.catalystsecure.com' -Scope Global
 }
 if ( [System.String]::IsNullOrEmpty($TDDCProtocol))
 {
