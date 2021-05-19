@@ -6,8 +6,13 @@ GEM
       nokogiri (>= 1.4.4)
       uuidtools (~> 2.1)
     json (1.7.7)
-    nokogiri (1.5.6)
-    nokogiri (1.5.6-x86-mingw32)
+    mini_portile2 (2.5.1)
+    nokogiri (1.11.4)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
+    nokogiri (1.11.4-x86-mingw32)
+      racc (~> 1.4)
+    racc (1.5.2)
     rake (10.0.3)
     uuidtools (2.1.3)
 
@@ -16,6 +21,6 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  aws-sdk
-  nokogiri
-  rake
+  aws-sdk (< 2)
+  nokogiri (= 1.11.4)
+  rake (= 10.0.3)
