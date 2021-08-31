@@ -10,7 +10,7 @@ Get-Matters -Company <CompanyID> | Get-LegalHolds | Convert-LegalHoldToCustodian
             Set-aduser -Replace @{description="OnLegalHold"} -Identity $user
         } else {
             Write-Host "Setting $($email) to OFF legal hold status"
-            Set-AdUser -Replace @{description="OffKegalHold"} -Identity $user
+            Set-AdUser -Replace @{description="OffLegalHold"} -Identity $user
         }
     }
 }
